@@ -19,7 +19,7 @@ struct Handler {
 impl Handler {
     fn new() -> Self {
         Self {
-            re: Regex::new(r"https://([^\s/.]+\.)*(spotify\.com|music\.apple\.com|youtube\.com|youtu\.be|tidal\.com|music\.amazon\.[^\s/.]+|pandora\.com|soundcloud\.com|deezer\.com|qobuz\.com|napster\.com)/\S+").unwrap(),
+            re: Regex::new(r"https://(?:[^\s/.]+\.)*(spotify\.com|music\.apple\.com|youtube\.com|youtu\.be|tidal\.com|music\.amazon\.[^\s/.]+|pandora\.com|soundcloud\.com|deezer\.com|qobuz\.com|napster\.com)/\S+").unwrap(),
             client: Client::new(),
         }
     }
@@ -29,13 +29,13 @@ impl Handler {
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         if !msg.is_own(&ctx.cache) {
-            if let Some(m) = self.re.find(&msg.content) {
+            if let Some(c) = self.re.captures(&msg.content) {
                 // https://songwhip.com/faq#does-songwhip-have-an-api
                 let res = self
                     .client
                     .post("https://songwhip.com/")
                     .json(&URL {
-                        url: m.as_str().to_string(),
+                        url: c[0].to_string(),
                     })
                     .send()
                     .await
@@ -45,7 +45,12 @@ impl EventHandler for Handler {
                     let url = res.json::<URL>().await.unwrap().url;
 
                     // Wrap in <> to disable auto-embed
-                    msg.reply(&ctx.http, format!("<{url}>")).await.unwrap();
+                    let content = match &c[1] {
+                        "tidal.com" => url,
+                        _ => format!("<{url}>"),
+                    };
+
+                    msg.reply(&ctx.http, content).await.unwrap();
                 }
             }
         }
