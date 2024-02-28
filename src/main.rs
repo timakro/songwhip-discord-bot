@@ -47,6 +47,7 @@ impl EventHandler for Handler {
                     // Wrap in <> to disable auto-embed
                     let content = match &c[1] {
                         "tidal.com" => url,
+                        "youtube.com" => format!("<{}>", url.replace("/album-", "/")),
                         _ => format!("<{url}>"),
                     };
 
