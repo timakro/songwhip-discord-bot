@@ -7,15 +7,15 @@ edition = "2021"
 
 [dependencies]
 dotenvy = "0.15.7"
-regex = "1.9.1"
-reqwest = "0.11.18"
-serde = "1.0.175"
+regex = "1.10.3"
+reqwest = { version = "0.11.24", features = ["json"] }
+serde = "1.0.197"
 
 [dependencies.tokio]
-version = "1.29.1"
+version = "1.36.0"
 features = ["macros", "rt-multi-thread"]
 
 [dependencies.serenity]
-version = "0.11.6"
+version = "0.12.1"
 default-features = false
 features = ["builder", "cache", "client", "gateway", "http", "model", "utils", "rustls_backend"]
